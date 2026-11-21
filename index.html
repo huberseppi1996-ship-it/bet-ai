@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101410">
+<meta name="description" content="BET AI – Wettschein- und Bankroll-Manager">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>BET AI – Sports Betting Manager</title>
+<style>
+:root{--bg:#0c100d;--panel:#151c17;--panel2:#1b251e;--line:#2b392e;--txt:#edf4ee;--muted:#9ba99e;--green:#9be36b;--red:#ff7777;--amber:#f4c66a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:22px 18px 14px;background:linear-gradient(135deg,#17241a,#0c100d);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3}
+.brand{font-size:12px;letter-spacing:3px;color:var(--green);font-weight:800}.brand b{font-size:25px;color:white;letter-spacing:1px;display:block;margin-top:3px}
+main{max-width:850px;margin:auto;padding:16px 14px 95px}.tabs{display:flex;gap:7px;overflow:auto;padding:10px 0 2px}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:10px 13px;border-radius:12px;white-space:nowrap;font-weight:650}
+.tab.active{background:var(--green);color:#142014;border-color:var(--green)}
+h2{font-size:21px;margin:12px 0 4px}h3{font-size:15px;margin:0 0 12px}.muted,.hint{color:var(--muted)}.hint{font-size:12px;line-height:1.5}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:15px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{background:var(--panel2);border-radius:13px;padding:13px}.metric small{color:var(--muted);display:block}.metric strong{font-size:24px;display:block;margin-top:5px;font-variant-numeric:tabular-nums}
+label{display:block;color:var(--muted);font-size:12px;margin:10px 0 5px}input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#0f1511;color:var(--txt);font:inherit;min-width:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;background:var(--green);color:#152015;font-weight:800;padding:12px 15px;border-radius:11px;margin-top:12px;width:100%;font:inherit;cursor:pointer}
+.btn.secondary{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}.btn.danger{background:#482323;color:#ffdede}
+.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#26362a;color:var(--green);font-size:11px;font-weight:800}
+.item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pos{color:var(--green)}.neg{color:var(--red)}.warn{color:var(--amber)}
+.hidden{display:none!important}.filter{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+footer{position:fixed;bottom:0;left:0;right:0;background:#0c100df2;border-top:1px solid var(--line);padding:9px 14px;text-align:center;color:var(--muted);font-size:11px}
+@media(min-width:650px){main{padding-top:22px}.grid.four{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="brand">SPORTS ANALYTICS <b>BET AI</b></div><div class="hint">Dein Wettschein- und Bankroll-Manager · lokaler Prototyp</div></header>
+<main>
+<nav class="tabs">
+<button class="tab active" data-tab="home">Übersicht</button><button class="tab" data-tab="generator">KI-Generator</button><button class="tab" data-tab="slips">Gespielte Scheine</button><button class="tab" data-tab="wallet">Guthaben</button><button class="tab" data-tab="stats">Statistik</button>
+</nav>
+
+<section id="home">
+<h2>Dein Dashboard</h2><p class="hint">bwin und bet365 bleiben strikt getrennt – auch bei Quoten, Scheinen und Kontoständen.</p>
+<div class="grid">
+<div class="metric"><small>bwin-Guthaben</small><strong id="homeBwin">0,00 €</strong></div>
+<div class="metric"><small>bet365-Guthaben</small><strong id="homeBet">0,00 €</strong></div>
+<div class="metric"><small>Gesamtguthaben</small><strong id="homeTotal">0,00 €</strong></div>
+<div class="metric"><small>Netto-Ergebnis</small><strong id="homeNet">0,00 €</strong></div>
+</div>
+<div class="card"><h3>Letzte Wettscheine</h3><div id="recent" class="hint">Noch keine Scheine erfasst.</div></div>
+<div class="card"><h3>Datensicherung</h3>
+<p class="hint">Exportiere deine Scheine und Kontobewegungen regelmäßig als Sicherungsdatei. Beim Wechsel auf eine installierte Version kannst du sie wieder importieren.</p>
+<button class="btn secondary" id="exportData">Daten sichern (JSON)</button>
+<label class="btn secondary" for="importFile" style="display:block;text-align:center;cursor:pointer">Sicherung wiederherstellen</label>
+<input id="importFile" type="file" accept="application/json,.json" style="display:none">
+</div>
+<div class="card"><h3>So funktioniert's</h3><p class="hint">1. Quoten für genau einen Buchmacher erfassen. 2. Einen Schein erstellen oder eigene Wette eintragen. 3. Einsatz bestätigen und als gespielt speichern. 4. Ergebnis später abrechnen. Ein- und Auszahlungen werden separat verbucht.</p></div>
+</section>
+
+<section id="generator" class="hidden">
+<h2>Wettschein-Generator</h2><p class="hint">Erstelle Kandidaten aus deinen eingegebenen Spielen. Dies ist noch keine Live-KI-Analyse und ruft keine bwin-/bet365-Quoten ab.</p>
+<div class="card">
+<label>Buchmacher – ein Schein, ein Anbieter</label><select id="gBook"><option>bwin</option><option>bet365</option></select>
+<label>Kategorie</label><select id="gCat"><option value="safe">Konservativ – niedrige Einzelquoten</option><option value="balanced">Ausgewogen – mittlere Quoten</option><option value="high">Hohe Einzelquoten</option><option value="all">Alle eingegebenen Spiele</option></select>
+<div class="row"><div><label>Heimteam</label><input id="gHome" placeholder="z. B. Bayern"></div><div><label>Auswärtsteam</label><input id="gAway" placeholder="z. B. Köln"></div></div>
+<label>Wettmarkt</label><select id="gMarket"><option>1X</option><option>X2</option><option>Über 1,5 Tore</option><option>1X + Über 1,5</option><option>X2 + Über 1,5</option><option>Eigener Markt</option></select>
+<div class="row"><div><label>Quote</label><input id="gOdds" type="number" min="1.01" step=".01" placeholder="1.45"></div><div><label>Notiz (optional)</label><input id="gNote" placeholder="Form / Statistik"></div></div>
+<button class="btn secondary" id="addLeg">Spiel zur Auswahl hinzufügen</button>
+<div id="candidateList" class="hint" style="margin-top:10px">Noch keine Spiele hinzugefügt.</div>
+<div class="row"><div><label>Spiele pro Schein</label><select id="gCount"><option>2</option><option selected>4</option><option>5</option><option>6</option></select></div><div><label>Einsatz (€)</label><input id="gStake" type="number" min=".01" step=".01" value="10"></div></div>
+<button class="btn" id="buildSlip">Schein zusammenstellen</button><div id="generated"></div>
+</div>
+<div class="card"><h3>Hinweis zur KI</h3><p class="hint">Die derzeitige Version berechnet Kombiquoten und verwaltet Daten. Für echte KI-Prognosen und Live-Quoten braucht es später einen angebundenen KI-Dienst sowie einen lizenzierten Quoten-Datenanbieter. Die App erfindet deshalb keine aktuellen Spiele, Quoten oder Wahrscheinlichkeiten.</p></div>
+</section>
+
+<section id="slips" class="hidden">
+<h2>Gespielte Scheine</h2><p class="hint">KI-Scheine übernehmen oder unabhängig gespielte eigene Scheine erfassen.</p>
+<div class="card">
+<h3>Eigenen Schein hinzufügen</h3>
+<div class="row"><div><label>Buchmacher</label><select id="sBook"><option>bwin</option><option>bet365</option></select></div><div><label>Status</label><select id="sStatus"><option value="Offen">Offen</option><option value="Gewonnen">Gewonnen</option><option value="Verloren">Verloren</option><option value="Storniert">Storniert</option></select></div></div>
+<label>Bezeichnung / Spiele</label><textarea id="sDesc" rows="2" placeholder="z. B. Bayern–Köln: 1X; Dortmund–Mainz: Über 1,5"></textarea>
+<div class="row"><div><label>Tatsächlicher Einsatz (€)</label><input id="sStake" type="number" min=".01" step=".01" value="10"></div><div><label>Tatsächliche Gesamtquote</label><input id="sOdds" type="number" min="1" step=".01" placeholder="3.85"></div></div>
+<label>Tatsächliche Auszahlung (€) – bei Gewinn</label><input id="sPayout" type="number" min="0" step=".01" placeholder="z. B. 38.50">
+<button class="btn" id="saveSlip">Schein als gespielt speichern</button>
+</div><div id="slipList" class="card"></div>
+</section>
+
+<section id="wallet" class="hidden">
+<h2>Getrennte Konten</h2><p class="hint">Buchungen werden dem jeweils ausgewählten Anbieter zugeordnet.</p>
+<div class="grid"><div class="metric"><small>bwin</small><strong id="walletBwin">0,00 €</strong></div><div class="metric"><small>bet365</small><strong id="walletBet">0,00 €</strong></div></div>
+<div class="card"><h3>Einzahlung / Auszahlung / Korrektur</h3>
+<label>Buchmacher</label><select id="wBook"><option>bwin</option><option>bet365</option></select>
+<div class="row"><div><label>Bewegung</label><select id="wType"><option value="deposit">Einzahlung</option><option value="withdraw">Auszahlung</option><option value="adjust">Kontostand-Korrektur</option></select></div><div><label>Betrag (€)</label><input id="wAmount" type="number" min=".01" step=".01" placeholder="50"></div></div>
+<label>Notiz</label><input id="wNote" placeholder="z. B. Aufladung per Bankkarte">
+<button class="btn" id="addMovement">Buchung speichern</button></div>
+<div class="card"><h3>Kontobewegungen</h3><div id="movementList" class="hint">Noch keine Bewegungen.</div></div>
+</section>
+
+<section id="stats" class="hidden">
+<h2>Statistik</h2><div class="card">
+<div class="filter"><div><label>Buchmacher</label><select id="fBook"><option value="Alle">Alle</option><option>bwin</option><option>bet365</option></select></div><div><label>Ergebnis</label><select id="fStatus"><option value="Alle">Alle</option><option>Offen</option><option>Gewonnen</option><option>Verloren</option><option>Storniert</option></select></div></div>
+<div class="grid" style="margin-top:12px"><div class="metric"><small>Erfasste Scheine</small><strong id="stCount">0</strong></div><div class="metric"><small>Trefferquote (abgerechnet)</small><strong id="stRate">–</strong></div><div class="metric"><small>Gesamte Einsätze</small><strong id="stStakes">0,00 €</strong></div><div class="metric"><small>Netto aus Scheinen</small><strong id="stNet">0,00 €</strong></div></div><div id="statsList" class="hint" style="margin-top:12px"></div>
+</div></section>
+</main><footer>BET AI · Prototyp · Daten bleiben in diesem Browser auf diesem Gerät</footer>
+<script>
+const KEY='betai_v1'; let db=JSON.parse(localStorage.getItem(KEY)||'{"balances":{"bwin":0,"bet365":0},"slips":[],"movements":[],"candidates":[]}');
+const $=id=>document.getElementById(id), money=n=>(Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'}), save=()=>{localStorage.setItem(KEY,JSON.stringify(db));render()};
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function net(){return db.slips.reduce((a,s)=>a+(s.status==='Gewonnen'?s.payout-s.stake:s.status==='Verloren'?-s.stake:s.status==='Storniert'?0:0),0)}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));['home','generator','slips','wallet','stats'].forEach(x=>$(x).classList.toggle('hidden',x!==b.dataset.tab));render()});
+let candidate=[];
+$('addLeg').onclick=()=>{let h=$('gHome').value.trim(),a=$('gAway').value.trim(),o=Number($('gOdds').value);if(!h||!a||!(o>1)){alert('Bitte Teams und eine Quote größer 1 eintragen.');return}candidate.push({home:h,away:a,market:$('gMarket').value,odds:o,book:$('gBook').value,note:$('gNote').value});$('candidateList').innerHTML=candidate.map((x,i)=>`<div class="item">${i+1}. ${esc(x.home)} – ${esc(x.away)} · ${esc(x.market)} · ${x.odds.toFixed(2)}</div>`).join('');$('gHome').value='';$('gAway').value='';$('gOdds').value='';};
+$('buildSlip').onclick=()=>{let book=$('gBook').value,cat=$('gCat').value,n=Number($('gCount').value),arr=candidate.filter(x=>x.book===book).filter(x=>cat==='all'||(cat==='safe'&&x.odds<1.7)||(cat==='balanced'&&x.odds>=1.7&&x.odds<2.5)||(cat==='high'&&x.odds>=2.5)).slice(0,n);if(arr.length===0){$('generated').innerHTML='<p class="hint warn">Keine passenden Spiele für diesen Anbieter und diese Kategorie vorhanden.</p>';return}let q=arr.reduce((v,x)=>v*x.odds,1),stake=Number($('gStake').value)||0;$('generated').innerHTML=`<div class="card"><div class="between"><b>Vorschlag · ${book}</b><span class="pill">${arr.length} Spiele</span></div>${arr.map(x=>`<div class="item">${esc(x.home)} – ${esc(x.away)}<br><span class="hint">${esc(x.market)} · Quote ${x.odds.toFixed(2)}</span></div>`).join('')}<div class="between"><b>Rechnerische Gesamtquote</b><b>${q.toFixed(2)}</b></div><div class="between"><span>Einsatz ${money(stake)}</span><b>Mögliche Auszahlung ${money(stake*q)}</b></div><button class="btn" id="takeGenerated">Als gespielt übernehmen</button><p class="hint">Der Vorschlag ist keine KI-Prognose. Prüfe jedes Spiel und die tatsächliche Annahmequote beim Buchmacher.</p></div>`;$('takeGenerated').onclick=()=>{db.slips.unshift({id:Date.now(),book,desc:arr.map(x=>`${x.home}–${x.away}: ${x.market} (${x.odds})`).join('; '),stake,odds:q,payout:0,status:'Offen',date:new Date().toISOString(),source:'Generator'});db.balances[book]-=stake;candidate=candidate.filter(x=>!arr.includes(x));save();alert('Schein übernommen. Einsatz wurde vom passenden Buchmacher-Konto abgezogen.')};};
+$('saveSlip').onclick=()=>{let book=$('sBook').value,stake=Number($('sStake').value),odds=Number($('sOdds').value),status=$('sStatus').value,payout=Number($('sPayout').value)||0;if(!(stake>0)||!$('sDesc').value.trim()){alert('Bitte Beschreibung und gültigen Einsatz eingeben.');return}if(status==='Gewonnen'&&payout<=0){alert('Bitte die tatsächliche Auszahlung eintragen.');return}db.slips.unshift({id:Date.now(),book,desc:$('sDesc').value,stake,odds,payout,status,date:new Date().toISOString(),source:'Manuell'});db.balances[book]-=stake;if(status==='Gewonnen')db.balances[book]+=payout; if(status==='Storniert')db.balances[book]+=stake;save();$('sDesc').value='';$('sPayout').value='';alert('Schein gespeichert und Konto verbucht.')};
+$('addMovement').onclick=()=>{let b=$('wBook').value,t=$('wType').value,a=Number($('wAmount').value);if(!(a>0)){alert('Bitte einen Betrag größer 0 eingeben.');return}let delta=t==='deposit'?a:t==='withdraw'?-a:a-db.balances[b];db.balances[b]+=delta;db.movements.unshift({book:b,type:t,amount:delta,note:$('wNote').value,date:new Date().toISOString()});save();$('wAmount').value='';$('wNote').value=''};
+function render(){let b=db.balances;['homeBwin','walletBwin'].forEach(x=>$(x).textContent=money(b.bwin));['homeBet','walletBet'].forEach(x=>$(x).textContent=money(b.bet365));$('homeTotal').textContent=money(b.bwin+b.bet365);$('homeNet').textContent=money(net());$('recent').innerHTML=db.slips.slice(0,3).map(s=>`<div class="item"><div class="between"><b>${esc(s.book)} · ${esc(s.status)}</b><b>${money(s.stake)}</b></div><div class="hint">${esc(s.desc)}</div></div>`).join('')||'Noch keine Scheine erfasst.';
+$('slipList').innerHTML=db.slips.map(s=>`<div class="item"><div class="between"><b>${esc(s.book)} · ${esc(s.status)}</b><span class="pill">${new Date(s.date).toLocaleDateString('de-DE')}</span></div><div class="hint">${esc(s.desc)}</div><div class="between" style="margin-top:7px"><span>Einsatz ${money(s.stake)} · Quote ${Number(s.odds||0).toFixed(2)}</span><b>${s.status==='Gewonnen'?money(s.payout-s.stake):s.status==='Verloren'?'-'+money(s.stake):'–'}</b></div><div class="row"><div><label>Ergebnis ändern</label><select data-status="${s.id}"><option ${s.status==='Offen'?'selected':''}>Offen</option><option ${s.status==='Gewonnen'?'selected':''}>Gewonnen</option><option ${s.status==='Verloren'?'selected':''}>Verloren</option><option ${s.status==='Storniert'?'selected':''}>Storniert</option></select></div><div><label>Auszahlung (€)</label><input data-payout="${s.id}" type="number" step=".01" min="0" value="${s.payout||''}" placeholder="tatsächlich"></div></div><button class="btn secondary" data-update="${s.id}">Abrechnung aktualisieren</button></div>`).join('')||'Noch keine Scheine erfasst.';
+document.querySelectorAll('[data-update]').forEach(btn=>btn.onclick=()=>{let s=db.slips.find(x=>x.id==btn.dataset.update),old=s.status,oldPay=s.payout;let st=document.querySelector(`[data-status="${s.id}"]`).value,pay=Number(document.querySelector(`[data-payout="${s.id}"]`).value)||0;if(st==='Gewonnen'&&pay<=0){alert('Bitte tatsächliche Auszahlung eintragen.');return}if(old==='Offen'){}else if(old==='Gewonnen')db.balances[s.book]-=oldPay;else if(old==='Verloren')db.balances[s.book]+=s.stake;else if(old==='Storniert')db.balances[s.book]-=s.stake;if(st==='Gewonnen')db.balances[s.book]+=pay;else if(st==='Verloren')db.balances[s.book]-=s.stake;else if(st==='Storniert')db.balances[s.book]+=s.stake;s.status=st;s.payout=pay;save()});
+$('movementList').innerHTML=db.movements.map(m=>`<div class="item"><div class="between"><b>${esc(m.book)} · ${m.type==='deposit'?'Einzahlung':m.type==='withdraw'?'Auszahlung':'Korrektur'}</b><b class="${m.amount>=0?'pos':'neg'}">${m.amount>=0?'+':''}${money(m.amount)}</b></div><div class="hint">${new Date(m.date).toLocaleString('de-DE')} · ${esc(m.note)}</div></div>`).join('')||'Noch keine Bewegungen.';
+let f=db.slips.filter(s=>($('fBook').value==='Alle'||s.book===$('fBook').value)&&($('fStatus').value==='Alle'||s.status===$('fStatus').value)),settled=f.filter(s=>['Gewonnen','Verloren'].includes(s.status)),won=settled.filter(s=>s.status==='Gewonnen').length,st=f.reduce((a,s)=>a+s.stake,0),n=f.reduce((a,s)=>a+(s.status==='Gewonnen'?s.payout-s.stake:s.status==='Verloren'?-s.stake:0),0);$('stCount').textContent=f.length;$('stRate').textContent=settled.length?(won/settled.length*100).toFixed(1)+' %':'–';$('stStakes').textContent=money(st);$('stNet').textContent=money(n);$('statsList').innerHTML=f.map(s=>`<div class="item">${esc(s.book)} · ${esc(s.status)} · ${money(s.stake)} · ${esc(s.desc)}</div>`).join('')||'Keine passenden Scheine.'}
+$('exportData').onclick=()=>{const blob=new Blob([JSON.stringify({app:'BET AI',version:1,exportedAt:new Date().toISOString(),data:db},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BET_AI_Sicherung_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href)};
+$('importFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const obj=JSON.parse(await file.text());if(!obj.data||!obj.data.balances||!Array.isArray(obj.data.slips)||!Array.isArray(obj.data.movements))throw new Error('Ungültige Sicherungsdatei');if(!confirm('Aktuelle Daten durch die Sicherung ersetzen?'))return;db=obj.data;save();alert('Sicherung erfolgreich eingespielt.')}catch(err){alert('Import fehlgeschlagen: '+err.message)}e.target.value=''};
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+['fBook','fStatus'].forEach(id=>$(id).onchange=render);render();
+</script></body></html>

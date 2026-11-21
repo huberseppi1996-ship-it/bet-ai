@@ -1,0 +1,24 @@
+{
+  "name": "BET AI – Sports Betting Manager",
+  "short_name": "BET AI",
+  "description": "Wettschein- und Bankroll-Manager",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0c100d",
+  "theme_color": "#101410",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
